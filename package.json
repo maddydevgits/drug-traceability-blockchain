@@ -1,0 +1,27 @@
+{
+  "name": "drug-traceability-blockchain",
+  "version": "1.0.0",
+  "description": "Drug Traceability in Healthcare Supplychain using Blockchain",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maddydevgits/drug-traceability-blockchain.git"
+  },
+  "keywords": [
+    "blockchain",
+    "healthchain",
+    "drug-traceability"
+  ],
+  "author": "Maddy",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/maddydevgits/drug-traceability-blockchain/issues"
+  },
+  "homepage": "https://github.com/maddydevgits/drug-traceability-blockchain#readme",
+  "devDependencies": {
+    "lite-server": "^2.6.1"
+  }
+}
