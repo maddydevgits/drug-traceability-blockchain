@@ -8,4 +8,5 @@ Tracking supplies through this network is non-trivial due to several factors inc
 
 1. Create a Login and Register for all roles :heavy_check_mark:
 2. Create a Smart Contract for login and register :heavy_check_mark:
-3. Create a Migration Script for deploying register smart contract :x:
+3. Create a Migration Script for deploying register smart contract :heavy_check_mark:
+4. Test, and Validate the Login and Register pages with Smart Contract :x:
