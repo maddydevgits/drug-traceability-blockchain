@@ -24,7 +24,24 @@
 </nav>
 
 <div class="container">
-  <h2>Lab Dashboard</h2> <br/><br/>
+  <h2>Lab Dashboard</h2> <br/>
+  <h3 style="text-align:center;color:rebeccapurple">List of Manufacturers who are producing our drugs</h3> <br/><br/>
+  <div class="table-responsive-sm">
+    <table class="table table-bordered">
+        <tr>
+            <th>Manufacturer Wallet</th>
+            <th>Manufacturer Name</th>
+            <th>Drug Sanctioned</th>
+        </tr>
+        {%for i in range(0, len)%}
+        <tr>
+            <td>{{dashboard_data[i][0]}}</td>
+            <td>{{dashboard_data[i][1]}}</td>
+            <td>{{dashboard_data[i][2]}}</td>
+        </tr>
+        {%endfor%}
+    </table>
+    </div>
     
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>

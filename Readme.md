@@ -11,4 +11,5 @@ Tracking supplies through this network is non-trivial due to several factors inc
 3. Create a Migration Script for deploying register smart contract :heavy_check_mark:
 4. Test, and Validate the Login and Register pages with Smart Contract :heavy_check_mark:
 5. Create a Lab Dashboard :heavy_check_mark:
-6. Create Smart Contract Functions for Lab Dashboard :x:
+6. Create Smart Contract Functions for Lab Dashboard :heavy_check_mark:
+7. Create a Manufacturer Dashboard :x:
