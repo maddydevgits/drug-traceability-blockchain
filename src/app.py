@@ -53,11 +53,77 @@ def loginUser():
     contract,web3=connect_Blockchain_register(walletaddr)
     state=contract.functions.loginUser(walletaddr,password).call()
     print(state)
-    if(state=='True'):
+    if(state==True):
         session['walletaddr']=walletaddr
-        return redirect('/dashboard')
+        contract,web3=connect_Blockchain_register(walletaddr)
+        _users,_passwords,_roles,_names=contract.functions.viewUsers().call()
+        userIndex=_users.index(walletaddr)
+        role=_roles[userIndex]
+        print(role)
+        if(role==1):
+            return redirect('/labdashboard')
+        elif(role==2):
+            return redirect('/manudashboard')
+        elif(role==3):
+            return redirect('/waremdashboard')
+        elif(role==4):
+            return redirect('/transdashboard')
+        elif(role==5):
+            return redirect('/waretdashboard')
+        elif(role==6):
+            return redirect('/hospitalsdashboard')
+        elif(role==7):
+            return redirect('/retailersdashboard')
     else:
         return redirect('/login')
+
+@app.route('/labdashboard')
+def labDashboard():
+    return render_template('labdashboard.html')
+
+@app.route('/manudashboard')
+def manudashboard():
+    return render_template('manudashboard.html')
+
+@app.route('/waremdashboard')
+def waremdashboard():
+    return render_template('waremdashboard.html')
+
+@app.route('/transdashboard')
+def transdashboard():
+    return render_template('transdashboard.html')
+
+@app.route('/waretdashboard')
+def waretdashboard():
+    return render_template('waretdashboard.html')
+
+@app.route('/hospitalsdashboard')
+def hospitalsdashboard():
+    return render_template('hospitalsdashboard.html')
+
+@app.route('/retailersdashboard')
+def retailersdashboard():
+    return render_template('retailersdashboard.html')
+
+@app.route('/logout')
+def logout():
+    session['walletaddr']=''
+    return redirect('/')
+
+@app.route('/shareFormula',methods=['POST','GET'])
+def shareFormula():
+    walletaddr=request.form['walletaddr']
+    mformula=request.form['mformula']
+    print(walletaddr,mformula)
+    return redirect('/viewlabmanufacturers')
+
+@app.route('/viewlabmanufacturers')
+def viewlabmanufacturers():
+    return render_template('viewlabmanufacturers.html')
+
+@app.route('/viewFeedbackslab')
+def viewFeedbackslab():
+    return render_template('viewFeedbackslab.html')
 
 if(__name__=="__main__"):
     app.run(debug=True)
