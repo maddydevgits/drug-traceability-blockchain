@@ -28,7 +28,7 @@ def addLabManufacturer(walletaddr,formula):
 def addLabFeedback(formula,feed):
     contract,web3=connect_Blockchain_drug(0)
 
-    _labmanu,_labform=contract.functions.viewLabManufacturers().call()
+    _lab,_labmanu,_labform=contract.functions.viewLabManufacturers().call()
     formindex=_labform.index(formula)
     print(_labmanu,_labform,formindex)
 

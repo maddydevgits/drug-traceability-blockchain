@@ -24,4 +24,26 @@ Tracking supplies through this network is non-trivial due to several factors inc
 16. Create Smart Contract Functions for Hospitals Dashboard :heavy_check_mark:
 17. Create Retailers Dashboard :heavy_check_mark:
 18. Create Smart Contract Functions for Retailers Dashboard :heavy_check_mark:
-19. Create Patients Dashboard :x:
+19. Create Patients Dashboard :heavy_check_mark:
+20. Create Smart Contract Functions for Patients Dashboard :heavy_check_mark:
+
+# Softwares
+1. Ganache
+2. Truffle
+3. VS Code
+4. Python3
+
+# Packages
+1. flask
+2. web3
+
+# Execution Process
+1. Clone the Repo
+2. Launch Ganache
+3. Compile Smart Contracts (truffle compile)
+4. Migrate the Smart Contracts (truffle migrate)
+5. Copy the Smart Contract Addresses into app.py
+6. Run the server (python app.py)
+
+# Questions
+For questions do reach me on <a href="https://linkedin.com/in/MadhuPIoT">LinkedIn</a>

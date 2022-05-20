@@ -90,6 +90,8 @@ def loginUser():
             return redirect('/hospitalsdashboard')
         elif(role==7):
             return redirect('/retailersdashboard')
+        elif(role==8):
+            return redirect('/patientsdashboard')
     else:
         return redirect('/login')
 
@@ -665,7 +667,7 @@ def rviewPatients():
 
     contract,web3=connect_Blockchain_drug(session['walletaddr'])
     _givers,_patients,_giverslotlabform,_giverscount=contract.functions.viewPatients().call()
-
+    
     data=[]
     for i in range(len(_patients)):
         if _givers[i]==session['walletaddr']:
@@ -678,6 +680,60 @@ def rviewPatients():
             data.append(dummy)
     l=len(data)
     return render_template('rviewPatients.html',len=l,dashboard_data=data)
+
+@app.route('/patientsdashboard')
+def patientsdashboard():
+    walletaddr=session['walletaddr']
+    contract,web3=connect_Blockchain_register(0)
+    _users,_passwords,_roles,_names=contract.functions.viewUsers().call()
+
+    contract,web3=connect_Blockchain_drug(session['walletaddr'])
+    _givers,_patients,_giverslotlabform,_giverscount=contract.functions.viewPatients().call()
+    _lab,_labmanu,_labform=contract.functions.viewLabManufacturers().call()
+
+    data=[]
+    for i in range(len(_patients)):
+        if _patients[i]==walletaddr:
+            dummy=[]
+            giverIndex=_users.index(_givers[i])
+            dummy.append(_names[giverIndex])
+            labformIndex=_labform.index(_giverslotlabform[i])
+            manuIndex=_users.index(_labmanu[labformIndex])
+            labIndex=_users.index(_lab[labformIndex])
+            dummy.append(_names[manuIndex])
+            dummy.append(_names[labIndex])
+            dummy.append(_giverslotlabform[i])
+            dummy.append(_giverscount[i])
+            data.append(dummy)
+    l=len(data)
+    return render_template('patientsdashboard.html',len=l,dashboard_data=data)
+
+@app.route('/giveFeedback')
+def giveFeedback():
+    contract,web3=connect_Blockchain_drug(session['walletaddr'])
+    _givers,_patients,_giverslotlabform,_giverscount=contract.functions.viewPatients().call()
+    data=[]
+    for i in range(len(_patients)):
+        if _patients[i]==session['walletaddr']:
+            dummy=[]
+            dummy.append(_giverslotlabform[i])
+            if dummy not in data:
+                data.append(dummy)
+    l=len(data)
+    return render_template('giveFeedback.html',len1=l,dashboard_data1=data)
+
+@app.route('/giveFeedbackForm',methods=['POST','GET'])
+def giveFeedbackForm():
+    drug=request.form['lotlabform']
+    feedback=request.form['feedback']
+    print(drug,feedback)
+    contract,web3=connect_Blockchain_drug(session['walletaddr'])
+    _lab,_labmanu,_labform=contract.functions.viewLabManufacturers().call()
+    formindex=_labform.index(drug)
+    print(_labmanu,_labform,formindex)
+    tx_hash=contract.functions.addLabFeedback(formindex,feedback).transact()
+    web3.eth.waitForTransactionReceipt(tx_hash)
+    return redirect('/giveFeedback')
 
 if(__name__=="__main__"):
     app.run(debug=True)

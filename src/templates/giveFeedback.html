@@ -15,29 +15,30 @@
       <a class="navbar-brand" href="#">Drug Traceability Demo</a>
     </div>
     <ul class="nav navbar-nav">
-      <li><a href="/transdashboard">Dashboard</a></li>
-      <li class="active"><a href="/updateTransport">Update Transport</a></li>
+      <li><a href="/patientsdashboard">Dashboard</a></li>
+      <li class="active"><a href="/giveFeedback">Give Feedback</a></li>
       <li><a href="/logout">Logout</a></li>
     </ul>
   </div>
 </nav>
 
 <div class="container">
-  <h2>Transporter Dashboard</h2> <br/>
-  <h3 style="text-align:center;color:rebeccapurple">Update Transport</h3> <br/><br/>
-  <form action="/updateTransportForm" method="POST">
+  <h2>Patients Dashboard</h2> <br/>
+  <h3 style="text-align:center;color:rebeccapurple">Medical Consultation List</h3> <br/><br/>
+  <form action="/giveFeedbackForm" method="POST">
     <div class="form-group">
-      <label for="lotid">Enter Lot id:</label>
-      <input type="number" class="form-control" id="lotid" placeholder="Enter Lot id" name="lotid">
-    </div>
-    <div class="form-group">
-        <label for="sel1">Select your Status:</label>
-        <select class="form-control" id="transportStatus" name='transportStatus'>
-            <option value="0">1 -> In-Transit</option>
-            <option value="1">2 -> Delivered</option>
+        <label for="sel1">Select the drug that you want to give:</label>
+        <select class="form-control" id="lotlabform" name='lotlabform'>
+            {%for i in range(0, len1)%}
+            <option>{{dashboard_data1[i][0]}}</option>
+            {%endfor%}
         </select>
     </div>
-    <button type="submit" class="btn btn-primary btn-login" id="login">Schedule Transport</button>
+    <div class="form-group">
+        <label for="feedback">To which patient you want to allocate</label>
+        <input type="textarea" class="form-control" id="feedback" placeholder="Enter your feedback " name="feedback">
+    </div>
+    <button type="submit" class="btn btn-primary btn-login" id="login">Feedback</button>
     </form>
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
