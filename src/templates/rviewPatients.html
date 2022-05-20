@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Drug Traceability Demo</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="#">Drug Traceability Demo</a>
+    </div>
+    <ul class="nav navbar-nav">
+        <li><a href="/retailersdashboard">Dashboard</a></li>
+        <li><a href="/rgivetoPatient">Give to Patient</a></li>
+        <li class="active"><a href="/rviewPatients">View Patients</a></li>
+        <li><a href="/logout">Logout</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="container">
+  <h2>Hospitals Dashboard</h2> <br/>
+  <h3 style="text-align:center;color:rebeccapurple">Patient Records</h3> <br/><br/>
+  <div class="table-responsive-sm">
+    <table class="table table-bordered">
+        <tr>
+            <th>Patient Name</th>
+            <th>Patient Wallet</th>
+            <th>Medicine Name</th>
+            <th>Pill Count</th>
+        </tr>
+        {%for i in range(0, len)%}
+        <tr>
+            <td>{{dashboard_data[i][0]}}</td>
+            <td>{{dashboard_data[i][1]}}</td>
+            <td>{{dashboard_data[i][2]}}</td>
+            <td>{{dashboard_data[i][3]}}</td>
+        </tr>
+        {%endfor%}
+    </table>
+    </div>
+  
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+</body>
+</html>

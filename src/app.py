@@ -155,11 +155,6 @@ def waremdashboard():
     return render_template('waremdashboard.html',len=l,dashboard_data=data)
 
 
-
-@app.route('/retailersdashboard')
-def retailersdashboard():
-    return render_template('retailersdashboard.html')
-
 @app.route('/logout')
 def logout():
     session['walletaddr']=''
@@ -589,7 +584,7 @@ def viewPatients():
     
     contract,web3=connect_Blockchain_register(0)
     _users,_passwords,_roles,_names=contract.functions.viewUsers().call()
-    
+
     contract,web3=connect_Blockchain_drug(session['walletaddr'])
     _givers,_patients,_giverslotlabform,_giverscount=contract.functions.viewPatients().call()
 
@@ -606,6 +601,83 @@ def viewPatients():
     l=len(data)
     return render_template('viewPatients.html',len=l,dashboard_data=data)
 
+@app.route('/retailersdashboard')
+def retailersdashboard():
+    walletaddr=session['walletaddr']
+    contract,web3=connect_Blockchain_register(0)
+    _users,_passwords,_roles,_names=contract.functions.viewUsers().call()
+
+    contract,web3=connect_Blockchain_drug(walletaddr)
+    _retailwaret,_retailers,_retailerlotlabform,_retailercount=contract.functions.viewRetailers().call()
+    _lotmanu,_lotid,_lotpillcount,_lotlabform,_lotstatus=contract.functions.viewLots().call()
+    _lab,_labmanu,_labform=contract.functions.viewLabManufacturers().call()
+
+    data=[]
+    for i in range(len(_retailwaret)):
+        if _retailers[i]==walletaddr:
+            dummy=[]
+            distIndex=_users.index(_retailwaret[i])
+            dummy.append(_names[distIndex])
+            manuIndex=_lotlabform.index(_retailerlotlabform[i])
+            lotmanu=_lotmanu[manuIndex]
+            manuIndex=_users.index(lotmanu)
+            dummy.append(_names[manuIndex])
+            labIndex=_labform.index(_retailerlotlabform[i])
+            manulab=_lab[labIndex]
+            labIndex=_users.index(manulab)
+            dummy.append(_names[labIndex])
+            dummy.append(_retailerlotlabform[i])
+            dummy.append(_retailercount[i])
+            data.append(dummy)
+    l=len(data)
+    return render_template('retailersdashboard.html',len=l,dashboard_data=data)
+
+@app.route('/rgivetoPatient')
+def rgivetoPatient():
+    walletaddr=session['walletaddr']
+    contract,web3=connect_Blockchain_drug(walletaddr)
+    _retailwaret,_retailers,_retailerlotlabform,_retailercount=contract.functions.viewRetailers().call()
+    data=[]
+    for i in range(len(_retailercount)):
+        if walletaddr==_retailers[i]:
+            dummy=[]
+            dummy.append(_retailerlotlabform[i])
+            data.append(dummy)
+    l=len(data)
+    return render_template('rgivetoPatient.html',len1=l,dashboard_data1=data)
+
+@app.route('/rgivetoPatientForm',methods=['GET','POST'])
+def rgivetoPatientForm():
+    drug=request.form['lotlabform']
+    patientid=request.form['patientId']
+    count=int(request.form['lotpillcount'])
+    print(drug,patientid,count)
+    contract,web3=connect_Blockchain_drug(session['walletaddr'])
+    tx_hash=contract.functions.givetoPatients(session['walletaddr'],patientid,drug,count).transact()
+    web3.eth.waitForTransactionReceipt(tx_hash)
+    return redirect('/rviewPatients')
+
+@app.route('/rviewPatients')
+def rviewPatients():
+    
+    contract,web3=connect_Blockchain_register(0)
+    _users,_passwords,_roles,_names=contract.functions.viewUsers().call()
+
+    contract,web3=connect_Blockchain_drug(session['walletaddr'])
+    _givers,_patients,_giverslotlabform,_giverscount=contract.functions.viewPatients().call()
+
+    data=[]
+    for i in range(len(_patients)):
+        if _givers[i]==session['walletaddr']:
+            dummy=[]
+            patientIndex=_users.index(_patients[i])
+            dummy.append(_names[patientIndex])
+            dummy.append(_patients[i])
+            dummy.append(_giverslotlabform[i])
+            dummy.append(_giverscount[i])
+            data.append(dummy)
+    l=len(data)
+    return render_template('rviewPatients.html',len=l,dashboard_data=data)
 
 if(__name__=="__main__"):
     app.run(debug=True)
