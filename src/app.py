@@ -9,7 +9,7 @@ def connect_Blockchain_drug(acc):
         acc=web3.eth.accounts[0]
     web3.eth.defaultAccount=acc
     artifact_path='../build/contracts/drug.json'
-    contract_address="0x50f1728806f5cB3212d18f6b059925E6f552F967"
+    contract_address="0xAb543c5D03A136219d461B32f09658c9AA8054F0"
     with open(artifact_path) as f:
         contract_json=json.load(f)
         contract_abi=contract_json['abi']
@@ -25,7 +25,7 @@ def connect_Blockchain_register(acc):
         acc=web3.eth.accounts[0]
     web3.eth.defaultAccount=acc
     artifact_path='../build/contracts/register.json'
-    contract_address="0x5D1380e41BE1A17d6903a51a647a695888943fBe"
+    contract_address="0xcf2009324d6497eb7c698f0cc69E83b773Ac62Ea"
     with open(artifact_path) as f:
         contract_json=json.load(f)
         contract_abi=contract_json['abi']
@@ -99,7 +99,24 @@ def labDashboard():
 
 @app.route('/manudashboard')
 def manudashboard():
-    return render_template('manudashboard.html')
+    walletaddr=session['walletaddr']
+    contract,web3=connect_Blockchain_register(0)
+    _users,_passwords,_roles,_names=contract.functions.viewUsers().call()
+
+    contract,web3=connect_Blockchain_drug(walletaddr)
+    _lab,_labmanu,_labform=contract.functions.viewLabManufacturers().call()
+    data=[]
+    for i in range(len(_labform)):
+        dummy=[]
+        if(_labmanu[i]==walletaddr):
+            dummy.append(_labform[i])
+            dummy.append(_lab[i])
+            labindex=_users.index(_lab[i])
+            dummy.append(_names[labindex])
+        data.append(dummy)
+    print(data)
+    l=len(data)
+    return render_template('manudashboard.html',len=l,dashboard_data=data)
 
 @app.route('/waremdashboard')
 def waremdashboard():
@@ -132,7 +149,7 @@ def shareFormula():
     mformula=request.form['mformula']
     print(walletaddr,mformula)
     contract,web3=connect_Blockchain_drug(walletaddr)
-    tx_hash=contract.functions.addLabManufacturer(walletaddr,mformula).transact()
+    tx_hash=contract.functions.addLabManufacturer(session['walletaddr'],walletaddr,mformula).transact()
     web3.eth.waitForTransactionReceipt(tx_hash)
     return redirect('/viewlabmanufacturers')
 
@@ -142,7 +159,7 @@ def viewlabmanufacturers():
     _users,_passwords,_roles,_names=contract.functions.viewUsers().call()
 
     contract,web3=connect_Blockchain_drug(session['walletaddr'])
-    _labmanu,_labform=contract.functions.viewLabManufacturers().call()
+    _lab,_labmanu,_labform=contract.functions.viewLabManufacturers().call()
     data=[]
     for i in range(len(_labmanu)):
         dummy=[]
@@ -161,7 +178,7 @@ def viewFeedbackslab():
     _users,_passwords,_roles,_names=contract.functions.viewUsers().call()
 
     contract,web3=connect_Blockchain_drug(session['walletaddr'])
-    _labmanu,_labform=contract.functions.viewLabManufacturers().call()
+    _lab,_labmanu,_labform=contract.functions.viewLabManufacturers().call()
     _labfeeds=contract.functions.viewLabFeedback().call()
     data=[]
     for i in range(len(_labfeeds)):
@@ -175,6 +192,97 @@ def viewFeedbackslab():
     print(data)
     l=len(data)
     return render_template('viewFeedbackslab.html',len=l,dashboard_data=data)
+
+@app.route('/createlot')
+def createlot():
+    contract,web3=connect_Blockchain_drug(session['walletaddr'])
+    _lab,_labmanu,_labform=contract.functions.viewLabManufacturers().call()
+    data=[]
+    for i in range(len(_labform)):
+        dummy=[]
+        if(_labmanu[i]==session['walletaddr']):
+            dummy.append(_labform[i])
+        data.append(dummy)
+    return render_template('createlot.html',len1=len(data),dashboard_data1=data)
+
+@app.route('/createlotform',methods=['POST','GET'])
+def createlotform():
+    lotmanu=session['walletaddr']
+    lotid=int(request.form['lotid'])
+    lotpillcount=int(request.form['lotpillcount'])
+    lotlabform=request.form['lotlabform']
+    print(lotmanu,lotid,lotpillcount,lotlabform)
+    contract,web3=connect_Blockchain_drug(lotmanu)
+    tx_hash=contract.functions.createLot(lotmanu,lotid,lotpillcount,lotlabform).transact()
+    web3.eth.waitForTransactionReceipt(tx_hash)
+    return redirect('/viewlots')
+
+@app.route('/viewlots')
+def viewlots():
+    contract,web3=connect_Blockchain_register(0)
+    _users,_passwords,_roles,_names=contract.functions.viewUsers().call()
+
+    contract,web3=connect_Blockchain_drug(0)
+    _lotmanu,_lotid,_lotpillcount,_lotlabform,_lotstatus=contract.functions.viewLots().call()
+    print(_lotmanu,_lotid,_lotpillcount,_lotlabform,_lotstatus)
+    data=[]
+    for i in range(len(_lotid)):
+        dummy=[]
+        userIndex=_users.index(_lotmanu[i])
+        dummy.append(_names[userIndex])
+        dummy.append(_lotmanu[i])
+        dummy.append(_lotid[i])
+        dummy.append(_lotpillcount[i])
+        dummy.append(_lotlabform[i])
+        if(_lotstatus[i]==1):
+            dummy.append('Available')
+        else:
+            dummy.append('Allocated')
+        data.append(dummy)
+    l=len(data)
+    return render_template('viewlots.html',len=l,dashboard_data=data)
+
+@app.route('/allocatewarehousem')
+def allocatewarehousem():
+    return render_template('allocatewarehousem.html')
+
+@app.route('/allocatewarehousemform',methods=['POST','GET'])
+def allocatewarehousemform():
+    lotmanu=session['walletaddr']
+    lotid=int(request.form['lotid'])
+    lotwarem=request.form['lotwarem']
+    print(lotmanu,lotid,lotwarem)
+    contract,web3=connect_Blockchain_drug(lotmanu)
+    tx_hash=contract.functions.allocateLotWareM(lotmanu,lotid,lotwarem).transact()
+    web3.eth.waitForTransactionReceipt(tx_hash)
+    return redirect('/viewWarehousem')
+
+@app.route('/viewWarehousem')
+def viewWarehousem():
+    contract,web3=connect_Blockchain_register(0)
+    _users,_passwords,_roles,_names=contract.functions.viewUsers().call()
+
+    contract,web3=connect_Blockchain_drug(0)
+    _lotmanu,_lotid,_lotpillcount,_lotlabform,_lotstatus=contract.functions.viewLots().call()
+
+    _lotmanuwarehousem,_lotwarehousem,_lotidwarehousem=contract.functions.viewLotWareM().call()
+    print(_lotmanuwarehousem,_lotwarehousem,_lotidwarehousem)
+    data=[]
+    for i in range(len(_lotmanuwarehousem)):
+        dummy=[]
+        userIndex=_users.index(_lotmanuwarehousem[i])
+        dummy.append(_names[userIndex])
+        dummy.append(_lotmanuwarehousem[i])
+        lotnameIndex=_lotid.index(_lotidwarehousem[i])
+        dummy.append(_lotlabform[lotnameIndex])
+        dummy.append(_lotidwarehousem[i])
+        dummy.append(_lotpillcount[lotnameIndex])
+        userIndex=_users.index(_lotwarehousem[i])
+        dummy.append(_names[userIndex])
+        dummy.append(_lotwarehousem[i])
+        data.append(dummy)
+    l=len(data)
+    return render_template('viewWarehousem.html',len=l,dashboard_data=data)
 
 if(__name__=="__main__"):
     app.run(debug=True)
