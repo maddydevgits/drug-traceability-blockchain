@@ -37,6 +37,15 @@ contract drug {
     return(_waremtransport,_transporters,_warettransport,_transportStatus,_lotidtransport);
   }
 
+  function updateTransport(uint lotid,uint status) public {
+    uint i;
+    for(i=0;i<_lotidtransport.length;i++) {
+      if(_lotidtransport[i]==lotid) {
+        _transportStatus[i]=status;
+      }
+    }
+  }
+
   function createLot(address lotmanu,uint lotid,uint lotpillcount,string memory lotlabform) public {
 
     _lotmanu.push(lotmanu);
