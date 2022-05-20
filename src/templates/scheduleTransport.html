@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Drug Traceability Demo</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="#">Drug Traceability Demo</a>
+    </div>
+    <ul class="nav navbar-nav">
+      <li><a href="/waremdashboard">Dashboard</a></li>
+      <li class="active"><a href="/scheduleTransport">Schedule Transport</a></li>
+      <li><a href="/viewSchedules">View Schedules</a></li>
+      <li><a href="/logout">Logout</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="container">
+  <h2>Warehouse M Dashboard</h2> <br/>
+  <h3 style="text-align:center;color:rebeccapurple">Schedule a Transport</h3> <br/><br/>
+  <form action="/scheduletransportform" method="POST">
+    <div class="form-group">
+      <label for="lotid">Enter Lot id:</label>
+      <input type="number" class="form-control" id="lotid" placeholder="Enter Lot id" name="lotid">
+    </div>
+    <div class="form-group">
+        <label for="lottransporter">Through whom you want to transfer</label>
+        <input type="text" class="form-control" id="lottransporter" placeholder="Enter Transporter Wallet " name="lottransporter">
+    </div>
+    <div class="form-group">
+      <label for="lotwaret">To which warehouse you want to transfer</label>
+      <input type="text" class="form-control" id="lotwaret" placeholder="Enter Warehouse T Wallet " name="lotwaret">
+    </div>
+    <button type="submit" class="btn btn-primary btn-login" id="login">Schedule Transport</button>
+    </form>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+</body>
+</html>

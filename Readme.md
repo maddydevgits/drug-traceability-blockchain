@@ -14,4 +14,6 @@ Tracking supplies through this network is non-trivial due to several factors inc
 6. Create Smart Contract Functions for Lab Dashboard :heavy_check_mark:
 7. Create a Manufacturer Dashboard :heavy_check_mark:
 8. Create Smart Contract Functions for Manufacturer Dashboard :heavy_check_mark:
-9. Create a Warehouse M Dashboard :x:
+9. Create a Warehouse M Dashboard :heavy_check_mark:
+10. Create Smart Contract Functions for Warehouse M Dashboard :heavy_check_mark:
+11. Create a Transporter Dashboard :x:

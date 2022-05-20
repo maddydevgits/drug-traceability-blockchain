@@ -19,18 +19,22 @@ contract drug {
 
   address[] _waremtransport;
   address[] _transporters;
+  address[] _warettransport;
   uint[] _lotidtransport;
+  uint[] _transportStatus;
 
   mapping(string=>bool) labmanus;
 
-  function createTransport(address warem, address transport, uint lotid) public {
+  function createTransport(address warem, address transport, address waret, uint lotid) public {
     _waremtransport.push(warem);
     _transporters.push(transport);
     _lotidtransport.push(lotid);
+    _warettransport.push(waret);
+    _transportStatus.push(0);
   }
 
-  function viewTransport() public view returns(address[] memory,address[] memory,uint[] memory) {
-    return(_waremtransport,_transporters,_lotidtransport);
+  function viewTransport() public view returns(address[] memory,address[] memory,address[] memory, uint[] memory,uint[] memory) {
+    return(_waremtransport,_transporters,_warettransport,_transportStatus,_lotidtransport);
   }
 
   function createLot(address lotmanu,uint lotid,uint lotpillcount,string memory lotlabform) public {

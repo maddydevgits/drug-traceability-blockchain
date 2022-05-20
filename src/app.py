@@ -9,7 +9,7 @@ def connect_Blockchain_drug(acc):
         acc=web3.eth.accounts[0]
     web3.eth.defaultAccount=acc
     artifact_path='../build/contracts/drug.json'
-    contract_address="0xAb543c5D03A136219d461B32f09658c9AA8054F0"
+    contract_address="0xfd61e2d07f55EC227b5fC6b65B8a91E0859D6A8C"
     with open(artifact_path) as f:
         contract_json=json.load(f)
         contract_abi=contract_json['abi']
@@ -25,7 +25,7 @@ def connect_Blockchain_register(acc):
         acc=web3.eth.accounts[0]
     web3.eth.defaultAccount=acc
     artifact_path='../build/contracts/register.json'
-    contract_address="0xcf2009324d6497eb7c698f0cc69E83b773Ac62Ea"
+    contract_address="0xe9550C9d9751682a53dEf116305D0fAb3eFE12F7"
     with open(artifact_path) as f:
         contract_json=json.load(f)
         contract_abi=contract_json['abi']
@@ -120,7 +120,39 @@ def manudashboard():
 
 @app.route('/waremdashboard')
 def waremdashboard():
-    return render_template('waremdashboard.html')
+    contract,web3=connect_Blockchain_register(0)
+    _users,_passwords,_roles,_names=contract.functions.viewUsers().call()
+
+    contract,web3=connect_Blockchain_drug(0)
+    _lotmanu,_lotid,_lotpillcount,_lotlabform,_lotstatus=contract.functions.viewLots().call()
+
+    contract,web3=connect_Blockchain_drug(session['walletaddr'])
+    _lotmanuwarehousem,_lotwarehousem,_lotidwarehousem=contract.functions.viewLotWareM().call()
+    _waremtransport,_transporters,_warettransport,_transportStatus,_lotidtransport=contract.functions.viewTransport().call()
+    data=[]
+    for i in range(len(_lotidwarehousem)):
+        if _lotwarehousem[i]==session['walletaddr']:
+            dummy=[]
+            userIndex=_users.index(_lotmanuwarehousem[i])
+            dummy.append(_names[userIndex])
+            dummy.append(_lotmanuwarehousem[i])
+            dummy.append(_lotidwarehousem[i])
+            labformIndex=_lotid.index(_lotidwarehousem[i])
+            dummy.append(_lotlabform[labformIndex])
+            dummy.append(_lotpillcount[labformIndex])
+            
+            try:
+                lotstatusIndex=_lotidtransport.index(_lotidwarehousem[i])
+                if _transportStatus[lotstatusIndex]==0:
+                    dummy.append('In-Transit')
+                else:
+                    dummy.append('Delivered')
+            except:
+                dummy.append('Available')
+
+            data.append(dummy)
+    l=len(data)
+    return render_template('waremdashboard.html',len=l,dashboard_data=data)
 
 @app.route('/transdashboard')
 def transdashboard():
@@ -283,6 +315,49 @@ def viewWarehousem():
         data.append(dummy)
     l=len(data)
     return render_template('viewWarehousem.html',len=l,dashboard_data=data)
+
+@app.route('/scheduleTransport')
+def scheduleTransport():
+    return render_template('scheduleTransport.html')
+
+@app.route('/scheduletransportform',methods=['GET','POST'])
+def scheduletransportform():
+    walletaddr=session['walletaddr']
+    lotid=int(request.form['lotid'])
+    lottransporter=request.form['lottransporter']
+    lotwaret=request.form['lotwaret']
+    print(walletaddr,lotid,lottransporter,lotwaret)
+    contract,web3=connect_Blockchain_drug(walletaddr)
+    tx_hash=contract.functions.createTransport(walletaddr,lottransporter,lotwaret,lotid).transact()
+    web3.eth.waitForTransactionReceipt(tx_hash)
+    return redirect('/viewSchedules')
+
+@app.route('/viewSchedules')
+def viewSchedules():
+    walletaddr=session['walletaddr']
+    contract,web3=connect_Blockchain_register(0)
+    _users,_passwords,_roles,_names=contract.functions.viewUsers().call()
+
+    contract,web3=connect_Blockchain_drug(walletaddr)
+    _waremtransport,_transporters,_warettransport,_transportStatus,_lotidtransport=contract.functions.viewTransport().call()
+    data=[]
+    for i in range(len(_lotidtransport)):
+        if _waremtransport[i]==walletaddr:
+            dummy=[]
+            userIndex=_users.index(_transporters[i])
+            dummy.append(_names[userIndex])
+            dummy.append(_transporters[i])
+            userIndex=_users.index(_warettransport[i])
+            dummy.append(_names[userIndex])
+            dummy.append(_warettransport[i])
+            dummy.append(_lotidtransport[i])
+            if(_transportStatus[i]==1):
+                dummy.append("Delivered")
+            else:
+                dummy.append("In-transit")
+            data.append(dummy)
+    l=len(data)
+    return render_template('viewSchedules.html',len=l,dashboard_data=data)
 
 if(__name__=="__main__"):
     app.run(debug=True)
