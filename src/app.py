@@ -9,7 +9,7 @@ def connect_Blockchain_drug(acc):
         acc=web3.eth.accounts[0]
     web3.eth.defaultAccount=acc
     artifact_path='../build/contracts/drug.json'
-    contract_address="0x2f07588132decdA0020E46Fb9579d265D86219e1"
+    contract_address="0xbc91c08719953CA5c0bf544270E580f38B438085"
     with open(artifact_path) as f:
         contract_json=json.load(f)
         contract_abi=contract_json['abi']
@@ -25,7 +25,7 @@ def connect_Blockchain_register(acc):
         acc=web3.eth.accounts[0]
     web3.eth.defaultAccount=acc
     artifact_path='../build/contracts/register.json'
-    contract_address="0xD1efA8201c4d894F9eBdD96d7FeDb85fDccfcc1C"
+    contract_address="0xC5a89BD4A9A9201c29CB5d40DDeb5AB7B3810B3e"
     with open(artifact_path) as f:
         contract_json=json.load(f)
         contract_abi=contract_json['abi']
@@ -154,9 +154,7 @@ def waremdashboard():
     l=len(data)
     return render_template('waremdashboard.html',len=l,dashboard_data=data)
 
-@app.route('/hospitalsdashboard')
-def hospitalsdashboard():
-    return render_template('hospitalsdashboard.html')
+
 
 @app.route('/retailersdashboard')
 def retailersdashboard():
@@ -528,6 +526,86 @@ def viewDistribution():
     l=len(data)
     print(data)
     return render_template('viewDistribution.html',len=l,dashboard_data=data)
+
+@app.route('/hospitalsdashboard')
+def hospitalsdashboard():
+    walletaddr=session['walletaddr']
+    contract,web3=connect_Blockchain_register(0)
+    _users,_passwords,_roles,_names=contract.functions.viewUsers().call()
+
+    contract,web3=connect_Blockchain_drug(walletaddr)
+    _hospitalwaret,_hospitals,_hospitallotlabform,_hospitalcount=contract.functions.viewHospitals().call()
+    _lotmanu,_lotid,_lotpillcount,_lotlabform,_lotstatus=contract.functions.viewLots().call()
+    _lab,_labmanu,_labform=contract.functions.viewLabManufacturers().call()
+
+    data=[]
+    for i in range(len(_hospitalwaret)):
+        if _hospitals[i]==walletaddr:
+            dummy=[]
+            distIndex=_users.index(_hospitalwaret[i])
+            dummy.append(_names[distIndex])
+            manuIndex=_lotlabform.index(_hospitallotlabform[i])
+            lotmanu=_lotmanu[manuIndex]
+            manuIndex=_users.index(lotmanu)
+            dummy.append(_names[manuIndex])
+            labIndex=_labform.index(_hospitallotlabform[i])
+            manulab=_lab[labIndex]
+            labIndex=_users.index(manulab)
+            dummy.append(_names[labIndex])
+            dummy.append(_hospitallotlabform[i])
+            dummy.append(_hospitalcount[i])
+            data.append(dummy)
+    l=len(data)
+    return render_template('hospitalsdashboard.html',len=l,dashboard_data=data)
+
+@app.route('/givetoPatient')
+def givetoPatient():
+    walletaddr=session['walletaddr']
+    contract,web3=connect_Blockchain_drug(walletaddr)
+    _hospitalwaret,_hospitals,_hospitallotlabform,_hospitalcount=contract.functions.viewHospitals().call()
+    data=[]
+    for i in range(len(_hospitalcount)):
+        if walletaddr==_hospitals[i]:
+            dummy=[]
+            dummy.append(_hospitallotlabform[i])
+            data.append(dummy)
+    l=len(data)
+
+    return render_template('givetoPatient.html',len1=l,dashboard_data1=data)
+
+@app.route('/givetoPatientForm',methods=['GET','POST'])
+def givetoPatientForm():
+    drug=request.form['lotlabform']
+    patientid=request.form['patientId']
+    count=int(request.form['lotpillcount'])
+    print(drug,patientid,count)
+    contract,web3=connect_Blockchain_drug(session['walletaddr'])
+    tx_hash=contract.functions.givetoPatients(session['walletaddr'],patientid,drug,count).transact()
+    web3.eth.waitForTransactionReceipt(tx_hash)
+    return redirect('/viewPatients')
+
+@app.route('/viewPatients')
+def viewPatients():
+    
+    contract,web3=connect_Blockchain_register(0)
+    _users,_passwords,_roles,_names=contract.functions.viewUsers().call()
+    
+    contract,web3=connect_Blockchain_drug(session['walletaddr'])
+    _givers,_patients,_giverslotlabform,_giverscount=contract.functions.viewPatients().call()
+
+    data=[]
+    for i in range(len(_patients)):
+        if _givers[i]==session['walletaddr']:
+            dummy=[]
+            patientIndex=_users.index(_patients[i])
+            dummy.append(_names[patientIndex])
+            dummy.append(_patients[i])
+            dummy.append(_giverslotlabform[i])
+            dummy.append(_giverscount[i])
+            data.append(dummy)
+    l=len(data)
+    return render_template('viewPatients.html',len=l,dashboard_data=data)
+
 
 if(__name__=="__main__"):
     app.run(debug=True)

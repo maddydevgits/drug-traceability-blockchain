@@ -33,9 +33,25 @@ contract drug {
   string[] _retailerlotlabform;
   uint[] _retailercount; 
 
+  address[] _givers;
+  address[] _patients;
+  string[] _giverslotlabform;
+  uint[] _giverscount;
 
 
   mapping(string=>bool) labmanus;
+
+  function givetoPatients(address giver, address patient, string memory lotlabform,uint count) public {
+
+    _givers.push(giver);
+    _patients.push(patient);
+    _giverslotlabform.push(lotlabform);
+    _giverscount.push(count);
+  }
+
+  function viewPatients() public view returns (address[] memory,address[] memory, string[] memory, uint[] memory) {
+    return (_givers,_patients,_giverslotlabform,_giverscount);
+  }
 
   function distributeRetailers(address waret,address retailer,string memory lotlabform,uint count) public {
 

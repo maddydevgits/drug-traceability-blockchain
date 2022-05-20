@@ -20,4 +20,6 @@ Tracking supplies through this network is non-trivial due to several factors inc
 12. Create Smart Contract Functions for Transporter Dashboard :heavy_check_mark:
 13. Create a Warehouse T Dashboard :heavy_check_mark:
 14. Create Smart Contract Functions for Warehouse T Dashboard :heavy_check_mark:
-15. Create Hospitals Dashboard :x:
+15. Create Hospitals Dashboard :heavy_check_mark:
+16. Create Smart Contract Functions for Hospitals Dashboard :heavy_check_mark:
+17. Create Retailers Dashboard :x:
