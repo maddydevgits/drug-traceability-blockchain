@@ -23,7 +23,44 @@ contract drug {
   uint[] _lotidtransport;
   uint[] _transportStatus;
 
+  address[] _hospitalwaret;
+  address[] _hospitals;
+  string[] _hospitallotlabform;
+  uint[] _hospitalcount; 
+
+  address[] _retailwaret;
+  address[] _retailers;
+  string[] _retailerlotlabform;
+  uint[] _retailercount; 
+
+
+
   mapping(string=>bool) labmanus;
+
+  function distributeRetailers(address waret,address retailer,string memory lotlabform,uint count) public {
+
+    _retailwaret.push(waret);
+    _retailers.push(retailer);
+    _retailerlotlabform.push(lotlabform);
+    _retailercount.push(count);
+  }
+
+  function viewRetailers() public view returns(address[] memory, address[] memory, string[] memory, uint[] memory) {
+    return (_retailwaret,_retailers,_retailerlotlabform,_retailercount);
+  }
+
+  function distributeHospital(address waret, address hospital, string memory lotlabform, uint count) public {
+
+    _hospitalwaret.push(waret);
+    _hospitals.push(hospital);
+    _hospitallotlabform.push(lotlabform);
+    _hospitalcount.push(count);
+
+  }
+
+  function viewHospitals() public view returns(address[] memory,address[] memory, string[] memory, uint[] memory) {
+    return (_hospitalwaret,_hospitals,_hospitallotlabform,_hospitalcount);
+  }
 
   function createTransport(address warem, address transport, address waret, uint lotid) public {
     _waremtransport.push(warem);

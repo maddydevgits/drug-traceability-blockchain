@@ -9,7 +9,7 @@ def connect_Blockchain_drug(acc):
         acc=web3.eth.accounts[0]
     web3.eth.defaultAccount=acc
     artifact_path='../build/contracts/drug.json'
-    contract_address="0xd88Ff696F27bE605e6233faEcaBdf802ed6eCcD5"
+    contract_address="0x2f07588132decdA0020E46Fb9579d265D86219e1"
     with open(artifact_path) as f:
         contract_json=json.load(f)
         contract_abi=contract_json['abi']
@@ -25,7 +25,7 @@ def connect_Blockchain_register(acc):
         acc=web3.eth.accounts[0]
     web3.eth.defaultAccount=acc
     artifact_path='../build/contracts/register.json'
-    contract_address="0xaf0d2566f931Aa52F149250e45Bf9A6226f862f4"
+    contract_address="0xD1efA8201c4d894F9eBdD96d7FeDb85fDccfcc1C"
     with open(artifact_path) as f:
         contract_json=json.load(f)
         contract_abi=contract_json['abi']
@@ -153,10 +153,6 @@ def waremdashboard():
             data.append(dummy)
     l=len(data)
     return render_template('waremdashboard.html',len=l,dashboard_data=data)
-
-@app.route('/waretdashboard')
-def waretdashboard():
-    return render_template('waretdashboard.html')
 
 @app.route('/hospitalsdashboard')
 def hospitalsdashboard():
@@ -396,6 +392,142 @@ def updateTransportForm():
     tx_hash=contract.functions.updateTransport(lotid,transportStatus).transact()
     web3.eth.waitForTransactionReceipt(tx_hash)
     return(redirect('/transdashboard'))
+
+@app.route('/waretdashboard')
+def waretdashboard():
+    walletaddr=session['walletaddr']
+    contract,web3=connect_Blockchain_register(0)
+    _users,_passwords,_roles,_names=contract.functions.viewUsers().call()
+
+    contract,web3=connect_Blockchain_drug(walletaddr)
+    _lotmanu,_lotid,_lotpillcount,_lotlabform,_lotstatus=contract.functions.viewLots().call()
+
+    contract,web3=connect_Blockchain_drug(walletaddr)
+    _waremtransport,_transporters,_warettransport,_transportStatus,_lotidtransport=contract.functions.viewTransport().call()
+
+    data=[]
+    for i in range(len(_warettransport)):
+        if _warettransport[i]==walletaddr:
+            dummy=[]
+            waremIndex=_users.index(_waremtransport[i])
+            dummy.append(_names[waremIndex])
+            manuIndex=_lotid.index(_lotidtransport[i])
+            manuwallet=_lotmanu[manuIndex]
+            manuIndex=_users.index(manuwallet)
+            dummy.append(_names[manuIndex])
+            # dummy.append(_waremtransport[i])
+            transportIndex=_users.index(_transporters[i])
+            dummy.append(_names[transportIndex])
+            # dummy.append(_transporters[i])
+            lotIndex=_lotid.index(_lotidtransport[i])
+            dummy.append(_lotidtransport[i])
+            dummy.append(_lotlabform[lotIndex])
+            dummy.append(_lotpillcount[lotIndex])
+            if(_transportStatus[i]==0):
+                dummy.append('In-Transit')
+            else:
+                dummy.append('Available')
+            
+            data.append(dummy)
+    l=len(data)
+    return render_template('waretdashboard.html',len=l,dashboard_data=data)
+
+@app.route('/distributeHospitals')
+def distributeHospitals():
+    walletaddr=session['walletaddr']
+    contract,web3=connect_Blockchain_register(0)
+    _users,_passwords,_roles,_names=contract.functions.viewUsers().call()
+
+    contract,web3=connect_Blockchain_drug(walletaddr)
+    _lotmanu,_lotid,_lotpillcount,_lotlabform,_lotstatus=contract.functions.viewLots().call()
+
+    contract,web3=connect_Blockchain_drug(walletaddr)
+    _waremtransport,_transporters,_warettransport,_transportStatus,_lotidtransport=contract.functions.viewTransport().call()
+
+    data=[]
+    for i in range(len(_warettransport)):
+        if _warettransport[i]==walletaddr:
+            dummy=[]
+            lotIndex=_lotid.index(_lotidtransport[i])
+            dummy.append(_lotlabform[lotIndex])
+            data.append(dummy)
+    l=len(data)
+    return render_template('distributeHospitals.html',len1=l,dashboard_data1=data)
+
+@app.route('/distributeHospitalsForm',methods=['GET','POST'])
+def distributeHospitalsForm():
+    drug=request.form['lotlabform']
+    hospitalid=request.form['hospitalid']
+    count=int(request.form['lotpillcount'])
+    print(drug,hospitalid,count)
+    contract,web3=connect_Blockchain_drug(session['walletaddr'])
+    tx_hash=contract.functions.distributeHospital(session['walletaddr'],hospitalid,drug,count).transact()
+    web3.eth.waitForTransactionReceipt(tx_hash)
+    return (redirect('/viewDistribution'))
+
+@app.route('/distributeRetailers')
+def distributeRetailers():
+    walletaddr=session['walletaddr']
+    contract,web3=connect_Blockchain_register(0)
+    _users,_passwords,_roles,_names=contract.functions.viewUsers().call()
+
+    contract,web3=connect_Blockchain_drug(walletaddr)
+    _lotmanu,_lotid,_lotpillcount,_lotlabform,_lotstatus=contract.functions.viewLots().call()
+
+    contract,web3=connect_Blockchain_drug(walletaddr)
+    _waremtransport,_transporters,_warettransport,_transportStatus,_lotidtransport=contract.functions.viewTransport().call()
+
+    data=[]
+    for i in range(len(_warettransport)):
+        if _warettransport[i]==walletaddr:
+            dummy=[]
+            lotIndex=_lotid.index(_lotidtransport[i])
+            dummy.append(_lotlabform[lotIndex])
+            data.append(dummy)
+    l=len(data)
+    return render_template('distributeRetailers.html',len1=l,dashboard_data1=data)
+
+@app.route('/distributeRetailersForm',methods=['POST','GET'])
+def distributeRetailersForm():
+    drug=request.form['lotlabform']
+    retailerid=request.form['retailerid']
+    count=int(request.form['lotpillcount'])
+    print(drug,retailerid,count)
+    contract,web3=connect_Blockchain_drug(session['walletaddr'])
+    tx_hash=contract.functions.distributeRetailers(session['walletaddr'],retailerid,drug,count).transact()
+    web3.eth.waitForTransactionReceipt(tx_hash)
+    return (redirect('/viewDistribution'))
+
+@app.route('/viewDistribution')
+def viewDistribution():
+    walletaddr=session['walletaddr']
+    contract,web3=connect_Blockchain_register(0)
+    _users,_passwords,_roles,_names=contract.functions.viewUsers().call()
+
+    contract,web3=connect_Blockchain_drug(walletaddr)
+    _retailwaret,_retailers,_retailerlotlabform,_retailercount=contract.functions.viewRetailers().call()
+    _hospitalwaret,_hospitals,_hospitallotlabform,_hospitalcount=contract.functions.viewHospitals().call()
+    _lotmanu,_lotid,_lotpillcount,_lotlabform,_lotstatus=contract.functions.viewLots().call()
+    data=[]
+    for i in range(len(_retailwaret)):
+        if _retailwaret[i]==walletaddr:
+            dummy=[]
+            retailerIndex=_users.index(_retailers[i])
+            dummy.append(_names[retailerIndex])
+            dummy.append(_retailerlotlabform[i])
+            dummy.append(_retailercount[i])
+            data.append(dummy)
+    for i in range(len(_hospitalwaret)):
+        if _hospitalwaret[i]==walletaddr:
+            dummy=[]
+            hospitalIndex=_users.index(_hospitals[i])
+            dummy.append(_names[hospitalIndex])
+            dummy.append(_hospitallotlabform[i])
+            dummy.append(_hospitalcount[i])
+            data.append(dummy)
+    l=len(data)
+    print(data)
+    return render_template('viewDistribution.html',len=l,dashboard_data=data)
 
 if(__name__=="__main__"):
     app.run(debug=True)

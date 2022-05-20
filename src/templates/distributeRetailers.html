@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Drug Traceability Demo</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="#">Drug Traceability Demo</a>
+    </div>
+    <ul class="nav navbar-nav">
+      <li><a href="/waretdashboard">Dashboard</a></li>
+      <li><a href="/distributeHospitals">Distribute to Hospitals</a></li>
+      <li class="active"><a href="/distributeRetailers">Distribute to Retailers</a></li>
+      <li><a href="/viewDistribution">View Distribution</a></li>
+      <li><a href="/logout">Logout</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="container">
+  <h2>Warehouse T Dashboard</h2> <br/>
+  <h3 style="text-align:center;color:rebeccapurple">Distribute to Retailers</h3> <br/><br/>
+  <form action="/distributeRetailersForm" method="POST">
+    <div class="form-group">
+        <label for="sel1">Select the drug that you want to distribute:</label>
+        <select class="form-control" id="lotlabform" name='lotlabform'>
+            {%for i in range(0, len1)%}
+            <option>{{dashboard_data1[i][0]}}</option>
+            {%endfor%}
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="retailerid">To which retailer you want to distribute</label>
+        <input type="text" class="form-control" id="retailerid" placeholder="Enter Retailer Wallet " name="retailerid">
+    </div>
+    <div class="form-group">
+      <label for="lotpillcount">Enter number of pills you want to distribute</label>
+      <input type="number" class="form-control" id="lotpillcount" placeholder="Enter Number of pills you want " name="lotpillcount">
+    </div>
+    <button type="submit" class="btn btn-primary btn-login" id="login">Distribute to Retailer</button>
+    </form>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+</body>
+</html>
